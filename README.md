@@ -14,6 +14,7 @@ Compatible with vehicles equipped with CID/GID/BID/TID display units, additional
 - shows you what is currently playing on the center console display in **Aux mode**
   * prints **Artist**, **Track title** and **Album**, just like regular CD playback would
   * this is the default mode, otherwise accessible by long pressing "1"
+- **automatically reconnects** to your phone when the radio is started
 - alternatively, EHU32 can also display live data, such as vehicle speed, RPMs, coolant temperature and battery voltage
   * accessible by long pressing "2" on the radio panel
   * for single line displays, "3" prints just the coolant temperature
@@ -26,11 +27,11 @@ EHU32 can be updated over-the-air, holding "8" enables the wifi hotspot (passwor
 ## How it looks
 Demo videos:
 
-[![Click here to watch EHU32 demo on YouTube](https://img.youtube.com/vi/CZvhz3yvV1g/0.jpg)](https://www.youtube.com/watch?v=CZvhz3yvV1g)
-
-[![Click here to watch EHU32 demo on YouTube](https://img.youtube.com/vi/cj5L4aGAB5w/0.jpg)](https://www.youtube.com/watch?v=cj5L4aGAB5w)
+[![Click here to watch EHU32 demo on YouTube](https://img.youtube.com/vi/CZvhz3yvV1g/0.jpg)](https://www.youtube.com/watch?v=CZvhz3yvV1g) [![Click here to watch EHU32 demo on YouTube](https://img.youtube.com/vi/cj5L4aGAB5w/0.jpg)](https://www.youtube.com/watch?v=cj5L4aGAB5w)
 
 Here's another, extended demo showing EHU32 in action: [https://www.youtube.com/watch?v=8fi7kX9ci_o](https://www.youtube.com/watch?v=8fi7kX9ci_o)
+
+![VID_20250507_180309 mp4_snapshot_04 09 045](https://github.com/user-attachments/assets/ea93fcec-3e86-4963-869a-c7194ca0c965)
 
 ![IMG_20240217_172706](https://github.com/PNKP237/EHU32/assets/153071841/46e31e0d-70b7-423b-9a04-b4522eb96506)
 
@@ -57,21 +58,16 @@ Required connections:
 - I2S DAC: GND to SCK, D26 to BCK, D22 to DIN, D25 to LCK, D23 to XSMT;
 - Configure jumpers on the back of the I2S DAC module: short 1-L, 2-L, 4-L, 3 NOT SHORTED.
 
-Some ESP32 boards have been found to cause problems with audio playback over I2S (mainly exhibited with iPhones and Huawei phones), while it's difficult to suggest an ESP32 board that's confirmed to work, the **WeAct ESP32-D0WD** board is something that I can recommend myself.
+Some ESP32 boards have been found to cause problems with audio playback over I2S (mainly exhibited with iPhones and Huawei phones), while it's difficult to suggest an ESP32 board that's confirmed to work, the ones with antenna connectors are often fine. Look for boards with Espressif etched on the RF shield!
 
 This repo contains a PDF schematic outlining which connections are required to make this work and [this post](https://github.com/PNKP237/EHU32/issues/3#issuecomment-2121866276) shows how to install the modules within a CD30MP3 radio unit.
 
 Note that this should be soldered directly in the radio unit as the OBD-II port only provides unswitched 12V. Powering it from a 5V car charger also works.
 Do not connect headphones to the DAC module, its output is supposed to only be connected to amplifier input - in case of this project either the AUX socket of radio's internal AUX input.
 
-If you're successful in putting it together and satisfied with operation of EHU32 then I would be extremely grateful if you can share a photo or a short video showing the module in action!
-Any kind of feedback is valuable to me - be it issues, general usage or recommendations for additional functionality, I'll be happy to hear them.
-
-The EHU32 standalone PCB project is finally complete, but it'll take some time before I publish all the fabrication files, since I need to distribute the devices to volunteers for testing and gather feedback.
-
 ## Compilation notes
 Please use version **2.0.17 of ESP32 arduino core**. More recent versions don't seem stable enough, at least in my limited testing. 
-Tested with ESP32-A2DP v1.8.6 and arduino-audio-tools v1.1.0.
+Tested with ESP32-A2DP v1.8.7 and arduino-audio-tools v1.1.1.
 
 TWAI driver written by ESP as part of their ESP-IDF framework isn't perfect. To ensure everything works properly you'll need to modify "sdkconfig" which is located in %USERPROFILE%\AppData\Local\Arduino15\packages\esp32\hardware\esp32\version\tools\sdk\esp32\
 
