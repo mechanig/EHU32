@@ -1,122 +1,91 @@
 // below is data required to be included in every line - text formatting is based on those
 const char DIS_leftadjusted[14]={0x00,0x1B,0x00,0x5B,0x00,0x66,0x00,0x53,0x00,0x5F,0x00,0x67,0x00,0x6D}, DIS_smallfont[14]={0x00,0x1B,0x00,0x5B,0x00,0x66,0x00,0x53,0x00,0x5F,0x00,0x64,0x00,0x6D}, DIS_centered[8]={0x00, 0x1B, 0x00, 0x5B, 0x00, 0x63, 0x00, 0x6D}, DIS_rightadjusted[8]={0x00, 0x1B, 0x00, 0x5B, 0x00, 0x72, 0x00, 0x6D};
 
-char *transliterate(const char *input) {
-    size_t len = strlen(input);
-    char *output = (char *)malloc(len * 3 + 1); // allocate a maximum (3 characters per letter + '\0')
-
-    if (!output) { 
-        return NULL;
+static void transliterate_char(uint32_t charint, char *output, size_t *j) {
+    switch (charint) {
+        // Cyrillic uppercase (0xD0)
+        case 0x0404: output[(*j)++] = 'E'; break; // Є
+        case 0x0406: output[(*j)++] = 'I'; break; // І
+        case 0x0407: output[(*j)++] = 'Y'; output[(*j)++] = 'i'; break; // Ї
+        case 0x0410: output[(*j)++] = 'A'; break; // А
+        case 0x0411: output[(*j)++] = 'B'; break; // Б
+        case 0x0412: output[(*j)++] = 'V'; break; // В
+        case 0x0413: output[(*j)++] = 'G'; break; // Г
+        case 0x0414: output[(*j)++] = 'D'; break; // Д
+        case 0x0415: output[(*j)++] = 'E'; break; // Е
+        case 0x0401: output[(*j)++] = 'Y'; output[(*j)++] = 'o'; break; // Ё
+        case 0x0416: output[(*j)++] = 'Z'; output[(*j)++] = 'h'; break; // Ж
+        case 0x0417: output[(*j)++] = 'Z'; break; // З
+        case 0x0418: output[(*j)++] = 'Y'; break; // И
+        case 0x0419: output[(*j)++] = 'Y'; break; // Й
+        case 0x041A: output[(*j)++] = 'K'; break; // К
+        case 0x041B: output[(*j)++] = 'L'; break; // Л
+        case 0x041C: output[(*j)++] = 'M'; break; // М
+        case 0x041D: output[(*j)++] = 'N'; break; // Н
+        case 0x041E: output[(*j)++] = 'O'; break; // О
+        case 0x041F: output[(*j)++] = 'P'; break; // П
+        case 0x0420: output[(*j)++] = 'R'; break; // Р
+        case 0x0421: output[(*j)++] = 'S'; break; // С
+        case 0x0422: output[(*j)++] = 'T'; break; // Т
+        case 0x0423: output[(*j)++] = 'U'; break; // У
+        case 0x0424: output[(*j)++] = 'F'; break; // Ф
+        case 0x0425: output[(*j)++] = 'H'; break; // Х
+        case 0x0426: output[(*j)++] = 'T'; output[(*j)++] = 's'; break; // Ц
+        case 0x0427: output[(*j)++] = 'C'; output[(*j)++] = 'h'; break; // Ч
+        case 0x0428: output[(*j)++] = 'S'; output[(*j)++] = 'h'; break; // Ш
+        case 0x0429: output[(*j)++] = 'S'; output[(*j)++] = 'h'; output[(*j)++] = 'c'; output[(*j)++] = 'h'; break; // Щ
+        case 0x042B: output[(*j)++] = 'Y'; break; // Ы
+        case 0x042D: output[(*j)++] = 'E'; break; // Э
+        case 0x042E: output[(*j)++] = 'Y'; output[(*j)++] = 'u'; break; // Ю
+        case 0x042F: output[(*j)++] = 'Y'; output[(*j)++] = 'a'; break; // Я
+        // Cyrillic lowercase (0xD0, 0xD1)
+        case 0x0430: output[(*j)++] = 'a'; break; // а
+        case 0x0431: output[(*j)++] = 'b'; break; // б
+        case 0x0432: output[(*j)++] = 'v'; break; // в
+        case 0x0433: output[(*j)++] = 'g'; break; // г
+        case 0x0434: output[(*j)++] = 'd'; break; // д
+        case 0x0435: output[(*j)++] = 'e'; break; // е
+        case 0x0436: output[(*j)++] = 'z'; output[(*j)++] = 'h'; break; // ж
+        case 0x0437: output[(*j)++] = 'z'; break; // з
+        case 0x0438: output[(*j)++] = 'y'; break; // и
+        case 0x0439: output[(*j)++] = 'y'; break; // й
+        case 0x043A: output[(*j)++] = 'k'; break; // к
+        case 0x043B: output[(*j)++] = 'l'; break; // л
+        case 0x043C: output[(*j)++] = 'm'; break; // м
+        case 0x043D: output[(*j)++] = 'n'; break; // н
+        case 0x043E: output[(*j)++] = 'o'; break; // о
+        case 0x043F: output[(*j)++] = 'p'; break; // п
+        case 0x0440: output[(*j)++] = 'r'; break; // р
+        case 0x0441: output[(*j)++] = 's'; break; // с
+        case 0x0442: output[(*j)++] = 't'; break; // т
+        case 0x0443: output[(*j)++] = 'u'; break; // у
+        case 0x0444: output[(*j)++] = 'f'; break; // ф
+        case 0x0445: output[(*j)++] = 'h'; break; // х
+        case 0x0446: output[(*j)++] = 't'; output[(*j)++] = 's'; break; // ц
+        case 0x0447: output[(*j)++] = 'c'; output[(*j)++] = 'h'; break; // ч
+        case 0x0448: output[(*j)++] = 's'; output[(*j)++] = 'h'; break; // ш
+        case 0x0449: output[(*j)++] = 's'; output[(*j)++] = 'h'; output[(*j)++] = 'c'; output[(*j)++] = 'h'; break; // щ
+        case 0x044B: output[(*j)++] = 'y'; break; // ы
+        case 0x044D: output[(*j)++] = 'e'; break; // э
+        case 0x044E: output[(*j)++] = 'y'; output[(*j)++] = 'u'; break; // ю
+        case 0x044F: output[(*j)++] = 'y'; output[(*j)++] = 'a'; break; // я
+        case 0x0454: output[(*j)++] = 'y'; output[(*j)++] = 'e'; break; // є
+        case 0x0456: output[(*j)++] = 'i'; break; // і
+        case 0x0457: output[(*j)++] = 'y'; output[(*j)++] = 'i'; break; // ї
+        // Ukrainian-specific (0xD2)
+        case 0x0490: output[(*j)++] = 'G'; break; // Ґ
+        case 0x0491: output[(*j)++] = 'g'; break; // ґ
     }
-
-    size_t j = 0;
-    for (size_t i = 0; i < len; i++) {
-        unsigned char firstByte = (unsigned char)input[i];
-
-        if (firstByte == 0xD0 || firstByte == 0xD1 || firstByte == 0xD2) { // handle some cyrillic symbols in UTF-8
-            unsigned char secondByte = (unsigned char)input[++i];
-
-            switch (firstByte) {
-                case 0xD0:  
-                    switch (secondByte) {
-                        case 0x84: output[j++] = 'E'; break;
-                        case 0x86: output[j++] = 'I'; break;
-                        case 0x87: output[j++] = 'Y', output[j++] = 'i'; break;
-                        case 0x90: output[j++] = 'A'; break;
-                        case 0x91: output[j++] = 'B'; break;
-                        case 0x92: output[j++] = 'V'; break;
-                        case 0x93: output[j++] = 'G'; break;
-                        case 0x94: output[j++] = 'D'; break;
-                        case 0x95: output[j++] = 'E'; break;
-                        case 0x81: output[j++] = 'Y', output[j++] = 'o'; break;
-                        case 0x96: output[j++] = 'Z', output[j++] = 'h'; break;
-                        case 0x97: output[j++] = 'Z'; break;
-                        case 0x98: output[j++] = 'Y'; break;
-                        case 0x99: output[j++] = 'Y'; break;
-                        case 0x9A: output[j++] = 'K'; break;
-                        case 0x9B: output[j++] = 'L'; break;
-                        case 0x9C: output[j++] = 'M'; break;
-                        case 0x9D: output[j++] = 'N'; break;
-                        case 0x9E: output[j++] = 'O'; break;
-                        case 0x9F: output[j++] = 'P'; break;
-                        case 0xA0: output[j++] = 'R'; break;
-                        case 0xA1: output[j++] = 'S'; break;
-                        case 0xA2: output[j++] = 'T'; break;
-                        case 0xA3: output[j++] = 'U'; break;
-                        case 0xA4: output[j++] = 'F'; break;
-                        case 0xA5: output[j++] = 'H'; break;
-                        case 0xA6: output[j++] = 'T', output[j++] = 's'; break;
-                        case 0xA7: output[j++] = 'C', output[j++] = 'h'; break;
-                        case 0xA8: output[j++] = 'S', output[j++] = 'h'; break;
-                        case 0xA9: output[j++] = 'S', output[j++] = 'h', output[j++] = 'c', output[j++] = 'h'; break;
-                        case 0xAB: output[j++] = 'Y'; break;
-                        case 0xAD: output[j++] = 'E'; break;
-                        case 0xAE: output[j++] = 'Y', output[j++] = 'u'; break;
-                        case 0xAF: output[j++] = 'Y', output[j++] = 'a'; break;
-                        // lower case
-                        case 0xB0: output[j++] = 'a'; break;
-                        case 0xB1: output[j++] = 'b'; break;
-                        case 0xB2: output[j++] = 'v'; break;
-                        case 0xB3: output[j++] = 'g'; break;
-                        case 0xB4: output[j++] = 'd'; break;
-                        case 0xB5: output[j++] = 'e'; break;
-                        case 0xB6: output[j++] = 'z', output[j++] = 'h'; break;
-                        case 0xB7: output[j++] = 'z'; break;
-                        case 0xB8: output[j++] = 'y'; break;
-                        case 0xB9: output[j++] = 'y'; break;
-                        case 0xBA: output[j++] = 'k'; break;
-                        case 0xBB: output[j++] = 'l'; break;
-                        case 0xBC: output[j++] = 'm'; break;
-                        case 0xBD: output[j++] = 'n'; break;
-                        case 0xBE: output[j++] = 'o'; break;
-                        case 0xBF: output[j++] = 'p'; break;
-                    }
-                    break;
-
-                case 0xD1:
-                    switch (secondByte) {
-                        case 0x80: output[j++] = 'r'; break;
-                        case 0x81: output[j++] = 's'; break;
-                        case 0x82: output[j++] = 't'; break;
-                        case 0x83: output[j++] = 'u'; break;
-                        case 0x84: output[j++] = 'f'; break;
-                        case 0x85: output[j++] = 'h'; break;
-                        case 0x86: output[j++] = 't', output[j++] = 's'; break;
-                        case 0x87: output[j++] = 'c', output[j++] = 'h'; break;
-                        case 0x88: output[j++] = 's', output[j++] = 'h'; break;
-                        case 0x89: output[j++] = 's', output[j++] = 'h', output[j++] = 'c', output[j++] = 'h'; break;
-                        case 0x8B: output[j++] = 'y'; break;
-                        case 0x8D: output[j++] = 'e'; break;
-                        case 0x8E: output[j++] = 'y', output[j++] = 'u'; break;
-                        case 0x8F: output[j++] = 'y', output[j++] = 'a'; break;
-                        case 0x94: output[j++] = 'y', output[j++] = 'e'; break;
-                        case 0x96: output[j++] = 'i'; break;
-                        case 0x97: output[j++] = 'y', output[j++] = 'i'; break;
-                    }
-                    break;
-                
-                case 0xD2:
-                    switch (secondByte) {
-                      case 0x90: output[j++] = 'G'; break;
-                      case 0x91: output[j++] = 'g'; break;
-                    }
-                    break;
-            }
-        } else {
-            output[j++] = firstByte;
-        }
-    }
-
-    output[j] = '\0'; // end of the row
-    
-    return output;
 }
 
 // converts an UTF-8 buffer to UTF-16, filters out unsupported chars, returns the amount of chars processed
 unsigned int utf8_to_utf16(const char* utf8_buffer, char* utf16_buffer){
   unsigned int utf16_bytecount=0;
+  char temp_buffer[8]; // Temporary buffer for transliterated ASCII characters
+
   while (*utf8_buffer!='\0'){
     uint32_t charint=0;
+
     if ((*utf8_buffer&0x80)==0x00){
       charint=*utf8_buffer&0x7F;
       utf8_buffer++;
@@ -155,7 +124,18 @@ unsigned int utf8_to_utf16(const char* utf8_buffer, char* utf16_buffer){
         utf16_buffer[utf16_bytecount++]=static_cast<char>((charint>>8)&0xFF);
         utf16_buffer[utf16_bytecount++]=static_cast<char>(charint&0xFF);
       }
-    }
+    } else if (charint >= 0x0400 && charint <= 0x04FF) {
+        // Unsupported Cyrillic character, transliterate to ASCII
+        size_t j = 0;
+        transliterate_char(charint, temp_buffer, &j);
+        temp_buffer[j] = '\0';
+
+        // Convert transliterated ASCII to UTF-16
+        for (size_t k = 0; k < j; k++) {
+            utf16_buffer[utf16_bytecount++] = 0x00;
+            utf16_buffer[utf16_bytecount++] = temp_buffer[k];
+        }
+    } // Else, skip unsupported characters
   }
   return utf16_bytecount/2;  // amount of chars processed
 }
@@ -165,17 +145,17 @@ int processDisplayMessage(char* upper_line_buffer, char* middle_line_buffer, cha
   static char utf16_middle_line[256], utf16_lower_line[256], utf16_upper_line[256];
   int upper_line_buffer_length=0, middle_line_buffer_length=0, lower_line_buffer_length=0;
   if(upper_line_buffer!=nullptr){                                           // converting UTF-8 strings to UTF-16 and calculating string lengths to keep track of processed data
-    upper_line_buffer_length=utf8_to_utf16(transliterate(upper_line_buffer), utf16_upper_line);
+    upper_line_buffer_length=utf8_to_utf16(upper_line_buffer, utf16_upper_line);
   }
   if(middle_line_buffer!=nullptr){
-    middle_line_buffer_length=utf8_to_utf16(transliterate(middle_line_buffer), utf16_middle_line);
+    middle_line_buffer_length=utf8_to_utf16(middle_line_buffer, utf16_middle_line);
     if(middle_line_buffer_length==0 || (middle_line_buffer_length==1 && utf16_middle_line[1]==0x20)){ // -> empty line (or unsupported chars)
       snprintf(middle_line_buffer, 8, "Playing");    // if the middle line was to be blank you can at least tell that there's audio being played
-      middle_line_buffer_length=utf8_to_utf16(transliterate(middle_line_buffer), utf16_middle_line);   // do this once again for the new string
+      middle_line_buffer_length=utf8_to_utf16(middle_line_buffer, utf16_middle_line);   // do this once again for the new string
     }
   }
   if(lower_line_buffer!=nullptr){
-    lower_line_buffer_length=utf8_to_utf16(transliterate(lower_line_buffer), utf16_lower_line);
+    lower_line_buffer_length=utf8_to_utf16(lower_line_buffer, utf16_lower_line);
   }
 
   #ifdef DEBUG_STRINGS               // debug stuff
